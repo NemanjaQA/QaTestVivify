@@ -1,0 +1,103 @@
+{
+	"variables": [],
+	"info": {
+		"name": "nemanja",
+		"_postman_id": "08440000-b5f5-fc07-6af4-2a2940b84b20",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "LOGIN",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							"var data = JSON.parse(responseBody);",
+							"",
+							"postman.setEnvironmentVariable(\"openid_access_token\", data.access_token);",
+							"postman.setEnvironmentVariable(\"openid_token_type\", data.token_type);",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://gallery-api.vivifyideas.com/api/auth/login",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\":\"fakeemail@qatasknemanja1.vivify\",\n\t\"password\":\"Password12345!\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get galleries",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": {
+					"raw": "https://gallery-api.vivifyideas.com/api/galleries?page=1&term=",
+					"protocol": "https",
+					"host": [
+						"gallery-api",
+						"vivifyideas",
+						"com"
+					],
+					"path": [
+						"api",
+						"galleries"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "term",
+							"value": "",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{openid_token_type}} {{openid_access_token}}",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
