@@ -8,96 +8,302 @@
 	},
 	"item": [
 		{
-			"name": "LOGIN",
-			"event": [
+			"name": "CRUD OK Flow",
+			"description": "",
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"tests[\"Status code is 200\"] = responseCode.code === 200;",
-							"",
-							"var data = JSON.parse(responseBody);",
-							"",
-							"postman.setEnvironmentVariable(\"openid_access_token\", data.access_token);",
-							"postman.setEnvironmentVariable(\"openid_token_type\", data.token_type);",
-							""
-						]
-					}
-				}
-			],
-			"request": {
-				"url": "https://gallery-api.vivifyideas.com/api/auth/login",
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"email\":\"fakeemail@qatasknemanja1.vivify\",\n\t\"password\":\"Password12345!\"\n}"
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
-			"name": "Get galleries",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"tests[\"Status code is 200\"] = responseCode.code === 200;"
-						]
-					}
-				}
-			],
-			"request": {
-				"url": {
-					"raw": "https://gallery-api.vivifyideas.com/api/galleries?page=1&term=",
-					"protocol": "https",
-					"host": [
-						"gallery-api",
-						"vivifyideas",
-						"com"
-					],
-					"path": [
-						"api",
-						"galleries"
-					],
-					"query": [
+					"name": "LOGIN",
+					"event": [
 						{
-							"key": "page",
-							"value": "1",
-							"equals": true,
-							"description": ""
-						},
-						{
-							"key": "term",
-							"value": "",
-							"equals": true,
-							"description": ""
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var data = JSON.parse(responseBody);",
+									"",
+									"postman.setEnvironmentVariable(\"openid_access_token\", data.access_token);",
+									"postman.setEnvironmentVariable(\"openid_token_type\", data.token_type);",
+									"postman.setEnvironmentVariable(\"user_id\", data.user_id);",
+									""
+								]
+							}
 						}
 					],
-					"variable": []
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{openid_token_type}} {{openid_access_token}}",
+					"request": {
+						"url": "https://gallery-api.vivifyideas.com/api/auth/login",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\":\"fakeemail@qatasknemanja1.vivify\",\n\t\"password\":\"Password12345!\"\n}"
+						},
 						"description": ""
-					}
-				],
-				"body": {},
-				"description": ""
-			},
-			"response": []
+					},
+					"response": []
+				},
+				{
+					"name": "Get my galleries",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var userId = postman.getEnvironmentVariable(\"user_id\");",
+									"var data = JSON.parse(responseBody);",
+									"",
+									"data.galleries.forEach(function(gallery){",
+									"    tests[\"User id\"] = gallery.user.id == userId;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": {
+							"raw": "https://gallery-api.vivifyideas.com/api/my-galleries?page=1&term=",
+							"protocol": "https",
+							"host": [
+								"gallery-api",
+								"vivifyideas",
+								"com"
+							],
+							"path": [
+								"api",
+								"my-galleries"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								},
+								{
+									"key": "term",
+									"value": "",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{openid_token_type}} {{openid_access_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add gallery",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 201\"] = responseCode.code === 201;",
+									"",
+									"var data = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"gallery_id\", data.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "https://gallery-api.vivifyideas.com/api/galleries",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "{{openid_token_type}} {{openid_access_token}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\":\"test\",\n\t\"description\":\"test test\",\n\t\"images\":[\"https://upload.wikimedia.org/wikipedia/commons/f/f7/Be%C5%A1ka_Most_1.jpg\"]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "GET Added Gallery",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 201\"] = responseCode.code == 200;",
+									"",
+									"var userId = postman.getEnvironmentVariable(\"user_id\");",
+									"var data = JSON.parse(responseBody);",
+									"",
+									"tests[\"Correct user id\"] = data.user.id == userId;",
+									"tests[\"Correct name\"] = data.title == \"test\";",
+									"tests[\"Correct description\"] = data.description == \"test test\";",
+									"tests[\"Correct number of images\"] = data.images.length == 1;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "https://gallery-api.vivifyideas.com/api/galleries/{{gallery_id}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{openid_token_type}} {{openid_access_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Edit gallery",
+					"request": {
+						"url": "https://gallery-api.vivifyideas.com/api/galleries/{{gallery_id}}",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{openid_token_type}} {{openid_access_token}}",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\":\"test edited\",\n\t\"description\":\"test test edited\",\n\t\"images\":[\"https://upload.wikimedia.org/wikipedia/commons/f/f7/Be%C5%A1ka_Most_1.jpg\"]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "GET Edited Gallery",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 201\"] = responseCode.code == 200;",
+									"",
+									"var userId = postman.getEnvironmentVariable(\"user_id\");",
+									"var data = JSON.parse(responseBody);",
+									"",
+									"tests[\"Correct user id\"] = data.user.id == userId;",
+									"tests[\"Correct name\"] = data.title == \"test edited\";",
+									"tests[\"Correct description\"] = data.description == \"test test edited\";",
+									"tests[\"Correct number of images\"] = data.images.length == 1;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "https://gallery-api.vivifyideas.com/api/galleries/{{gallery_id}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{openid_token_type}} {{openid_access_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Gallery",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 201\"] = responseCode.code == 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "https://gallery-api.vivifyideas.com/api/galleries/{{gallery_id}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{openid_token_type}} {{openid_access_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "GET Deleted Gallery",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 201\"] = responseCode.code == 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "https://gallery-api.vivifyideas.com/api/galleries/{{gallery_id}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{openid_token_type}} {{openid_access_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
